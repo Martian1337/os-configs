@@ -1,0 +1,38 @@
+WINDOWS OS Privacy Settings
+
+Configure Network Adapter:
+Disable Hyper-V adapter or remove Hyper-V with Debloater
+Ensure main adapter is set to DHCP or the correct setting to receive internet connection
+
+Manually Uninstall the following programs if present:
+Maps
+Solitaire
+Cortana
+Feedback Hub
+Weather
+Mail
+Outlook
+
+
+Installed Software Steps: 
+Install Brave
+https://brave.com/
+Configure brave to delete history on exit
+Set custom DNS in Brave https://base.dns.mullvad.net/dns-query
+
+Remove Edge after Downloading Browser with a debloater:
+1. https://github.com/LeDragoX/Win-Debloat-Tools
+2. https://github.com/ravendevteam/talon - https://ravendevteam.org/software/talon/
+
+Install Mullvad and Alternate Browser with different redering engine
+https://mullvad.net/en/download/browser/windows
+https://mullvad.net/en/download/vpn/windows
+(Chrome and Firefox variants now installed)
+
+Install ShutUp10 (Apply all settings and restart PC)
+https://www.oo-software.com/en/shutup10
+
+Install BetterBird (Use Portable or Run Installer)
+https://www.betterbird.eu/downloads/index.php
+
+
