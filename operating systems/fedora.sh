@@ -46,11 +46,10 @@ mkdir -p /etc/openvpn
 wget -q "https://raw.githubusercontent.com/ProtonVPN/scripts/master/update-resolv-conf.sh" -O "/etc/openvpn/update-resolv-conf"
 chmod +x "/etc/openvpn/update-resolv-conf"
 
-# Brave Browser
-echo "[+] Adding Brave repository and installing..."
-dnf install -y dnf-plugins-core
-dnf config-manager --add-repo=https://brave-browser-rpm-release.s3.brave.com/x86_64/ || true
-dnf install -y brave-browser
+# Mullvad Browser
+dnf config-manager addrepo --from-repofile=https://repository.mullvad.net/rpm/stable/mullvad.repo
+dnf install mullvad-vpn
+dnf install libappindicator-gtk3
 
 # LibreWolf
 echo "[+] Adding LibreWolf repository..."
