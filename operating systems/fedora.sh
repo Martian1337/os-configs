@@ -28,10 +28,14 @@ if [ ! -e /usr/bin/snap ]; then
 fi
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
-# Mullvad VPN
+# Mullvad VPN & Browser
 echo "[+] Adding Mullvad repository..."
 dnf config-manager addrepo --from-repofile=https://repository.mullvad.net/rpm/stable/mullvad.repo || true
-dnf install -y mullvad-vpn libappindicator-gtk3
+dnf install -y mullvad-vpn mullvad-browser libappindicator-gtk3
+
+# ProtonVPN Stack Prerequisites (Prevents eBPF/split-tunneling daemon scriptlet crashes)
+echo "[+] Installing ProtonVPN kernel/Python dependencies..."
+dnf install -y kernel-devel kernel-headers python3-bcc
 
 # ProtonVPN
 echo "[+] Installing ProtonVPN stack..."
@@ -51,9 +55,8 @@ mkdir -p /etc/openvpn
 wget -q "https://raw.githubusercontent.com/ProtonVPN/scripts/master/update-resolv-conf.sh" -O "/etc/openvpn/update-resolv-conf"
 chmod +x "/etc/openvpn/update-resolv-conf"
 
-# Mullvad Browser
-dnf config-manager addrepo --from-repofile=https://repository.mullvad.net/rpm/stable/mullvad.repo || true
-dnf install -y mullvad-browser
+# Ensure split-tunneling service won't break transaction if eBPF context isn't fully ready
+systemctl mask me.proton.vpn.split_tunneling.service || true
 
 # LibreWolf
 echo "[+] Adding LibreWolf repository..."
