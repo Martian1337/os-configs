@@ -31,7 +31,7 @@ flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flat
 # Mullvad VPN
 echo "[+] Adding Mullvad repository..."
 dnf config-manager --add-repo=https://repository.mullvad.net/rpm/stable/mullvad.repo || true
-dnf install -y mullvad-vpn
+dnf install -y mullvad-vpn libappindicator-gtk3
 
 # ProtonVPN
 echo "[+] Installing ProtonVPN stack..."
@@ -48,8 +48,7 @@ chmod +x "/etc/openvpn/update-resolv-conf"
 
 # Mullvad Browser
 dnf config-manager addrepo --from-repofile=https://repository.mullvad.net/rpm/stable/mullvad.repo
-dnf install mullvad-vpn
-dnf install libappindicator-gtk3
+dnf install mullvad-browser
 
 # LibreWolf
 echo "[+] Adding LibreWolf repository..."
