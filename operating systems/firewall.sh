@@ -19,6 +19,7 @@ ufw default allow outgoing
 
 # 3. Apply Tailscale-exclusive rules
 echo "Allowing RDP (3389) ONLY via Tailscale..."
+sudo ufw allow in on tailscale0
 ufw allow in on tailscale0 to any port 3389 proto tcp
 
 echo "Allowing SSH (22) ONLY via Tailscale (with rate limiting)..."
