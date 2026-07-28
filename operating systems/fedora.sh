@@ -38,16 +38,21 @@ echo "[+] Installing ProtonVPN stack..."
 FEDORA_VERSION=$(rpm -E %fedora)
 PROTON_RPM="protonvpn-stable-release-1.0.3-1.noarch.rpm"
 wget -q "https://repo.protonvpn.com/fedora-${FEDORA_VERSION}-stable/protonvpn-stable-release/${PROTON_RPM}"
-dnf install -y "./${PROTON_RPM}" proton-vpn-gnome-desktop libappindicator-gtk3 gnome-shell-extension-appindicator gnome-extensions-app openresolv
+dnf install -y "./${PROTON_RPM}"
 rm -f "${PROTON_RPM}"
-dnf check-update --refresh || true
+
+# Force immediate metadata sync so DNF recognizes the new packages
+dnf clean expire-cache
+dnf makecache
+
+dnf install -y proton-vpn-gnome-desktop libappindicator-gtk3 gnome-shell-extension-appindicator gnome-extensions-app openresolv
 
 mkdir -p /etc/openvpn
 wget -q "https://raw.githubusercontent.com/ProtonVPN/scripts/master/update-resolv-conf.sh" -O "/etc/openvpn/update-resolv-conf"
 chmod +x "/etc/openvpn/update-resolv-conf"
 
 # Mullvad Browser
-dnf config-manager addrepo --from-repofile=https://repository.mullvad.net/rpm/stable/mullvad.repo
+dnf config-manager addrepo --from-repofile=https://repository.mullvad.net/rpm/stable/mullvad.repo || true
 dnf install -y mullvad-browser
 
 # LibreWolf
@@ -63,7 +68,7 @@ dnf install -y codium
 
 # Lokinet
 echo "[+] Installing Lokinet..."
-dnf config-manager --add-repo https://rpm.oxen.io/fedora/oxen.repo || true
+dnf config-manager addrepo --from-repofile=https://rpm.oxen.io/fedora/oxen.repo || true
 dnf install -y lokinet
 systemctl enable lokinet --now
 
@@ -85,7 +90,7 @@ cat << 'EOF' >> "$LIBVIRTD_CONF"
 # Hardened overrides
 listen_tls = 0
 listen_tcp = 0
-auth_tcp = "- "sasl""
+auth_tcp = "sasl"
 unix_sock_group = "libvirt"
 unix_sock_ro_perms = "0777"
 unix_sock_rw_perms = "0770"
@@ -137,7 +142,7 @@ flatpak install -y flathub eu.betterbird.Betterbird
 flatpak install -y flathub com.bitwarden.desktop
 flatpak install -y flathub com.github.wwmm.easyeffects
 
-# Tuta Desktop AppImage integration (Updated from Tutanota)
+# Tuta Desktop AppImage integration
 echo "[+] Installing Tuta Desktop..."
 sudo -u "$TARGET_USER" mkdir -p "$USER_HOME/Applications" "$USER_HOME/Desktop"
 sudo -u "$TARGET_USER" curl -L https://app.tuta.com/desktop/tuta-desktop-linux.AppImage -o "$USER_HOME/Applications/tuta.AppImage"
