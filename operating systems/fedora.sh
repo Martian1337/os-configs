@@ -27,6 +27,7 @@ if [ ! -e /usr/bin/snap ]; then
     ln -s /usr/lib/snapd/snap /usr/bin/snap
 fi
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+dnf config-manager setopt oxen.enabled=0
 
 # Mullvad VPN & Browser
 echo "[+] Adding Mullvad repository..."
