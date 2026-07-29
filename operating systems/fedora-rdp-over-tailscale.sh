@@ -7,7 +7,7 @@
 # What it does:
 #   1. Installs tailscale, gnome-remote-desktop, openssl (from Fedora's own repos,
 #      which sidesteps the DNF5 --add-repo breakage / F43+ repo 404s)
-#   2. Brings the host onto your tailnet
+#   2. Brings the host onto your tailnet (optionally with Tailscale SSH)
 #   3. Generates a self-signed TLS cert for the system RDP service
 #   4. Sets the system RDP credential and enables the service
 #   5. Scopes firewalld so 3389 is reachable ONLY over tailscale0 (never LAN/WAN)
@@ -32,6 +32,7 @@ CERT_DAYS="${CERT_DAYS:-3650}"               # TLS cert validity in days
 FIREWALL_MODE="${FIREWALL_MODE:-trusted}"    # "trusted" = all tailnet traffic to host
                                              # "port"    = only SSH + 3389 over the tailnet
 FORCE_CERT="${FORCE_CERT:-0}"                # 1 = regenerate TLS cert even if one exists
+ENABLE_TS_SSH="${ENABLE_TS_SSH:-1}"          # 1 = also enable Tailscale SSH (tailnet-brokered, no host keys)
 TS_IFACE="tailscale0"
 GRD_USER="gnome-remote-desktop"
 GRD_HOME="/var/lib/gnome-remote-desktop"
@@ -63,11 +64,20 @@ systemd-sysusers >/dev/null 2>&1 || true
 # ---- Tailscale --------------------------------------------------------------
 step "Bringing up Tailscale"
 systemctl enable --now tailscaled
+ts_ssh_flag=""; [ "$ENABLE_TS_SSH" = "1" ] && ts_ssh_flag="--ssh"
 if tailscale status >/dev/null 2>&1; then
   info "Tailscale already authenticated."
+  # Node is already up — toggle the SSH setting without re-running the full 'up' flow.
+  if [ "$ENABLE_TS_SSH" = "1" ]; then
+    if tailscale set --ssh=true 2>/dev/null; then
+      info "Tailscale SSH enabled."
+    else
+      warn "Couldn't toggle Tailscale SSH via 'set'; run 'sudo tailscale up --ssh' manually."
+    fi
+  fi
 else
   warn "Opening Tailscale login — visit the URL it prints to authenticate."
-  tailscale up
+  tailscale up $ts_ssh_flag
 fi
 # Wait for the interface to come up before touching the firewall
 for _ in $(seq 1 15); do
@@ -157,7 +167,11 @@ cat <<EOF
     Auth : ${RDP_USER} / <your RDP password>  ->  then log in at GDM as your Fedora user
 
   Clients: mstsc (Windows) - Windows App (macOS) - Remmina / FreeRDP (Linux)
-
+$( [ "$ENABLE_TS_SSH" = "1" ] && printf '
+  Tailscale SSH: ssh <your-user>@%s
+    Brokered by your tailnet identity (no host keys). Requires a matching
+    "ssh" rule in your tailnet ACL policy, or connections will be denied.
+' "${TS_IP:-<tailscale-ip>}" )
   Tip: for per-device access control, gate port 3389 with a Tailscale ACL
   instead of widening the firewall.
 EOF
