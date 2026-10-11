@@ -41,6 +41,7 @@ rm eu.betterbird.Betterbird.flatpakref
 
 # Install Virt-manager and start libvirt service
 sudo apt install -y virt-manager libvirt-daemon-system libvirt-clients qemu-kvm
+sudo apt install -y qemu-system-x86 libvirt-daemon-system libvirt-clients bridge-utils virt-manager
 sudo systemctl enable --now libvirtd
 sudo usermod -aG libvirt,kvm $USER
 
