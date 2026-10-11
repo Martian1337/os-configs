@@ -2,7 +2,7 @@
 set -e
 
 # Install core dependencies
-sudo apt install -y snapd flatpak curl wget software-properties-common apt-transport-https
+sudo apt install -y snapd flatpak curl wget software-properties-common apt-transport-https openssh-server
 
 # Enable snapd socket
 sudo systemctl enable --now snapd.socket
