@@ -77,6 +77,14 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/JackHack96/PulseEffects-
 # Enable UFW
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
-sudo ufw enable
+# Allow SSH globally or specifically over Tailscale
+sudo ufw allow 22/tcp
+sudo ufw allow in on tailscale0 to any port 22 proto tcp
+# Allow internal Tailscale mesh networking traffic
+sudo ufw allow in on tailscale0
+# Allow RDP strictly from the Tailscale network range (100.64.0.0/10)
+sudo ufw allow from 100.64.0.0/10 to any port 3389 proto tcp
+# Enable UFW
+sudo ufw --force enable
 
 echo "Reminder: Please log out and log back in to apply group changes (libvirt and kvm)."
